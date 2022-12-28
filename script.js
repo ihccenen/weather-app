@@ -19,19 +19,28 @@ function getWeatherData(data) {
 }
 
 function displayWeather({
-  main, name, sys, weather, wind, unit,
+  main,
+  name,
+  sys,
+  weather,
+  wind,
+  unit,
 }) {
   const {
-    temp, temp_max, temp_min, humidity,
+    temp,
+    temp_max,
+    temp_min,
+    humidity,
   } = main;
   const { country } = sys;
   const { speed } = wind;
-  const { description } = weather[0];
+  const { description, icon } = weather[0];
   const container = document.querySelector('[data-container="display"]');
   const div = document.createElement('div');
   const rightSide = document.createElement('div');
   const leftSide = document.createElement('div');
   const tempContainer = document.createElement('div');
+  const img = document.createElement('img');
   const tempNow = document.createElement('p');
   const tempMax = document.createElement('p');
   const tempMin = document.createElement('p');
@@ -42,11 +51,13 @@ function displayWeather({
   const descriptionP = document.createElement('p');
 
   div.dataset.city = name;
-  div.classList.add('weather-display');
+  div.classList.add('weather-display', 'flex');
 
   rightSide.classList.add('rtl');
 
-  tempContainer.classList.add('inline');
+  tempContainer.classList.add('temp', 'flex');
+
+  img.src = `http://openweathermap.org/img/w/${icon}.png`;
 
   const tempUnit = unit === 'metric' ? '°C' : '°F';
 
@@ -55,9 +66,8 @@ function displayWeather({
   tempMin.textContent = `Min: ${Math.round(temp_min)} ${tempUnit}`;
 
   const windUnit = unit === 'metric' ? 'm/s' : 'mph';
-  const newSpeed = windUnit === 'metric' ? speed : speed * 2.237;
 
-  windP.textContent = `Wind: ${Math.round(newSpeed) + windUnit}`;
+  windP.textContent = `Wind: ${Math.round(speed) + windUnit}`;
 
   humidityP.textContent = `Humidity: ${humidity}%`;
 
@@ -65,7 +75,9 @@ function displayWeather({
   cityP.textContent = name;
   descriptionP.textContent = description[0].toUpperCase() + description.slice(1);
 
-  leftSide.append(tempNow, tempMax, tempMin, windP, humidityP);
+  tempContainer.append(img, tempNow);
+
+  leftSide.append(tempContainer, tempMax, tempMin, windP, humidityP);
 
   rightSide.append(cityP, country, descriptionP);
 
@@ -73,25 +85,40 @@ function displayWeather({
 
   if (container.firstChild) container.firstChild.remove();
 
+  const loading = document.querySelector('[data-div="loading"]');
+
+  loading.classList.add('hidden');
+  container.classList.remove('hidden');
+
   container.appendChild(div);
 }
 
 function displayError(error) {
   const container = document.querySelector('[data-container="display"]');
+  const loading = document.querySelector('[data-div="loading"]');
   const p = document.createElement('p');
 
   p.textContent = error.message.replace(/^./, (c) => c.toUpperCase());
+  p.classList.add('text-center');
+
+  loading.classList.add('hidden');
 
   if (container.firstChild) container.firstChild.remove();
 
+  container.classList.remove('hidden');
   container.appendChild(p);
 }
 
 function searchCity(e) {
   e.preventDefault();
 
+  const loading = document.querySelector('[data-div="loading"]');
+  const container = document.querySelector('[data-container="display"]');
   const obj = Object.fromEntries(new FormData(e.target));
   const { city, unit } = obj;
+
+  loading.classList.remove('hidden');
+  container.classList.add('hidden');
 
   fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=bedcb2e533f60a01f1927267c3f08a51&units=${unit}`, { mode: 'cors' })
     .then((response) => {

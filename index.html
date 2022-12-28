@@ -9,22 +9,23 @@
     <title>Weather App</title>
   </head>
   <body>
-    <div class="content">
-      <form action="#" data-form="location">
-        <div>
-          <label for="city">City</label>
-          <input type="text" name="city" id="city" data-input="city" required>
+    <div class="content flex">
+      <div class="container flex">
+        <form action="#" class="search flex" data-form="location">
+          <input type="text" name="city" id="city" data-input="city" required />
 
           <select name="unit" id="unit">
             <option value="metric">Celsius</option>
             <option value="imperial">Fahrenheit</option>
           </select>
-        </div>
-  
-        <button type="submit" data-btn="search-weather">Search</button>
-      </form>
-  
-      <div data-container="display"></div>
+
+          <button type="submit" data-btn="search-weather">Search</button>
+        </form>
+
+        <div class="text-center hidden" data-div="loading">Loading</div>
+
+        <div data-container="display"></div>
+      </div>
     </div>
   </body>
 </html>
